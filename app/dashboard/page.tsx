@@ -4,13 +4,12 @@ import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/session';
 import { deleteNote } from './actions';
 
-export default async function Dashboard({ searchParams }: { searchParams: Promise<{ org?: string }> }) {
+export default async function Dashboard() {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
 
-  // ?org= lets the workspace switcher link to another workspace.
-  const { org } = await searchParams;
-  const orgId = org ?? user.orgId;
+  // The company comes from the signed-in user, never from the URL.
+  const orgId = user.orgId;
 
   const notes = db.notesForOrg(orgId);
   const members = db.usersForOrg(orgId);
