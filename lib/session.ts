@@ -4,7 +4,13 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { cookies } from 'next/headers';
 import { db } from './db';
 
-const secret = () => process.env.SESSION_SECRET ?? 'dev-only-secret';
+// Without a secret in production anyone could sign a session for any user: refuse to run instead.
+function secret(): string {
+  const value = process.env.SESSION_SECRET;
+  if (value) return value;
+  if (process.env.NODE_ENV === 'production') throw new Error('SESSION_SECRET is not set');
+  return 'dev-only-secret';
+}
 
 export function sign(userId: string): string {
   return `${userId}.${createHmac('sha256', secret()).update(userId).digest('base64url')}`;

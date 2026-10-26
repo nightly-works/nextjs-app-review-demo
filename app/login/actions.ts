@@ -12,6 +12,12 @@ export async function login(formData: FormData) {
   const given = scryptSync(String(formData.get('password') ?? ''), salt ?? 'none', 32);
   if (!user || !hash || !timingSafeEqual(given, Buffer.from(hash, 'hex'))) redirect('/login?error=1');
 
-  (await cookies()).set('session', sign(user.id), { httpOnly: true, sameSite: 'lax', path: '/' });
+  (await cookies()).set('session', sign(user.id), {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 60 * 60 * 8,
+  });
   redirect('/dashboard');
 }
