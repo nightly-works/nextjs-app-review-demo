@@ -14,11 +14,16 @@ git worktree add -q --detach "$dir" as-delivered
 
 tap=$(APP_DIR="$dir" PORT=4311 node --test --test-reporter=tap tests/attacks.test.mjs 2>&1 || true)
 
+# The diagnostic block TAP prints under a test's result line, up to the next result.
+block() { awk -v n="$1" '$0 ~ "^(not )?ok [0-9]+ - " n "\\. " {on=1; next} on && /^(not )?ok [0-9]+ - / {exit} on' <<<"$tap"; }
+
 status=0
 for n in 1 2 3 4; do
   line=$(grep -E "^(not )?ok [0-9]+ - ${n}\. " <<<"$tap" || true)
   case "$line" in
-    "not ok"*) echo "as delivered, attack works: ${line#*- }" ;;
+    # Only a failed assertion shows the attack worked; a crash (server down, fetch error) proves nothing.
+    "not ok"*) if block "$n" | grep -q "ERR_ASSERTION"; then echo "as delivered, attack works: ${line#*- }"
+               else echo "as delivered, test crashed (proves nothing): ${line#*- }"; status=1; fi ;;
     "ok"*) echo "as delivered, test passed (attack did not reproduce): ${line#*- }"; status=1 ;;
     *) echo "missing: test ${n}"; status=1 ;;
   esac
