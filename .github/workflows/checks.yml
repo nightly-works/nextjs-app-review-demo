@@ -1,0 +1,21 @@
+name: checks
+on: [push, pull_request]
+jobs:
+  attacks-and-fixes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # prove-flaws.sh needs the as-delivered tag
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npx next build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+      - name: 'Fixed app: every attack refused, normal use works'
+        run: node --test tests/attacks.test.mjs
+      - name: 'App as delivered: every attack works'
+        run: ./scripts/prove-flaws.sh
+      - run: npm audit --omit=dev
