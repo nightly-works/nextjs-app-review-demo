@@ -40,6 +40,8 @@ Any signed-in user can read every company's notes and delete their colleagues' n
 **Fix**: the server component passes `{ id, name }` only.
 **Verified**: the dashboard's HTML contains member names but no email and no hash (test 4).
 
+**Also fixed**: the session secret fell back to a fixed default when unset, which in production would let anyone sign a session for any user; it now refuses to run. The session cookie gains `secure` in production and an eight-hour lifetime.
+
 ## Checked next in a full review
 
-Every other server action (including login: rate limiting and lockout), cookie flags in production, CSRF on route handlers that change data, file uploads, environment variables prefixed `NEXT_PUBLIC_`, the database's own access rules (RLS when on Supabase), and the Next.js version against current advisories.
+Every other server action (including login: rate limiting and lockout), CSRF on route handlers that change data, file uploads, environment variables prefixed `NEXT_PUBLIC_`, the database's own access rules (RLS when on Supabase), and the Next.js version against current advisories.

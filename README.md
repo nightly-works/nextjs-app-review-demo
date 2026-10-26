@@ -13,9 +13,9 @@ Full write-up, as a client receives it: [REPORT.md](REPORT.md).
 
 ## History
 
-1. `as-delivered` (tag): the app as handed over.
+1. `as-delivered` (tag): the app as written for the demo, flaws included.
 2. The four findings as attack tests: all fail on that code.
-3. One commit per fix, each turning one test green.
+3. One commit per fix, each turning one test green, then a hardening commit (no default session secret in production, secure cookie flags).
 
 ## Run
 
