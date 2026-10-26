@@ -1,9 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { User } from '@/lib/db';
-
-export function MemberList({ members }: { members: User[] }) {
+export function MemberList({ members }: { members: { id: string; name: string }[] }) {
   const [filter, setFilter] = useState('');
   const shown = members.filter((m) => m.name.toLowerCase().includes(filter.toLowerCase()));
   return (

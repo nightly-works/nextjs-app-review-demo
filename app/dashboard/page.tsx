@@ -12,7 +12,8 @@ export default async function Dashboard() {
   const orgId = user.orgId;
 
   const notes = db.notesForOrg(orgId);
-  const members = db.usersForOrg(orgId);
+  // Props of a client component are serialized into the page: pass only what it displays.
+  const members = db.usersForOrg(orgId).map(({ id, name }) => ({ id, name }));
 
   return (
     <main>
